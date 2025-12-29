@@ -1,37 +1,16 @@
 # ERPNext MCP Server Extended
 
-Extended MCP (Model Context Protocol) Server for ERPNext with additional tools for workflow management, custom fields, and DocType creation.
+Extended MCP (Model Context Protocol) Server for ERPNext with:
 
-This is a fork of [rakeshgangwar/erpnext-mcp-server](https://github.com/rakeshgangwar/erpnext-mcp-server) with significant extensions for advanced ERPNext automation.
+- **🔧 Improved Error Handling** - Returns detailed ERPNext error messages instead of generic failures
+- **📋 Workflow Management** - Create and manage approval workflows
+- **🔗 Custom Fields** - Add custom fields that survive ERPNext updates
+- **📦 DocType Creation** - Create new DocTypes programmatically
+- **🔄 Document Lifecycle** - Submit, cancel, and delete documents
 
-## Features
+## 🚀 Quick Start
 
-### Core Tools (from original)
-- `authenticate_erpnext` - Authenticate with ERPNext
-- `get_documents` - List documents with filtering
-- `get_document` - Get single document
-- `create_document` - Create new document
-- `update_document` - Update existing document
-- `get_doctypes` - List all DocTypes
-- `get_doctype_fields` - Get field definitions
-- `run_report` - Execute ERPNext reports
-
-### Extended Tools (new)
-| Tool | Description |
-|------|-------------|
-| `delete_document` | Delete a document from ERPNext |
-| `submit_document` | Submit a document (Draft → Submitted) |
-| `cancel_document` | Cancel a submitted document |
-| `get_doctype_meta` | Get complete DocType metadata including permissions |
-| `create_doctype` | Create new custom DocTypes |
-| `add_doctype_field` | Add fields to existing DocTypes |
-| `get_workflow` | Get active workflow for a DocType |
-| `create_workflow` | Create new workflows with states and transitions |
-| `update_workflow` | Modify existing workflows |
-| `create_custom_field` | Add custom fields (survives ERPNext updates) |
-| `create_property_setter` | Override DocType/field properties |
-
-## Installation
+### Installation
 
 ```bash
 git clone https://github.com/Kai-Oesterling/erpnext-mcp-server-extended.git
@@ -40,39 +19,28 @@ npm install
 npm run build
 ```
 
-## Configuration
+### Configuration
 
-### Claude Desktop - Complete MCP Setup
+Set environment variables:
 
-Below is a complete example configuration for Claude Desktop with multiple MCP servers including ERPNext, GitHub, Nextcloud, Metabase, and MSSQL.
+```bash
+export ERPNEXT_URL="https://your-erpnext-instance.com"
+export ERPNEXT_API_KEY="your-api-key"
+export ERPNEXT_API_SECRET="your-api-secret"
+export ERPNEXT_DEBUG="true"  # Optional: Enable debug logging
+```
 
-Add to your Claude Desktop configuration (`%APPDATA%\Claude\claude_desktop_config.json` on Windows):
+### Claude Desktop Configuration
+
+Add to `claude_desktop_config.json`:
+
+**Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Linux:** `~/.config/Claude/claude_desktop_config.json`
 
 ```json
 {
   "mcpServers": {
-    "github": {
-      "command": "docker",
-      "args": [
-        "run", "-i", "--rm",
-        "-e", "GITHUB_PERSONAL_ACCESS_TOKEN",
-        "ghcr.io/github/github-mcp-server"
-      ],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "your-github-token"
-      }
-    },
-    "mssql": {
-      "command": "npx",
-      "args": ["-y", "mssql-mcp@latest"],
-      "env": {
-        "DB_SERVER": "localhost",
-        "DB_DATABASE": "YourDatabase",
-        "DB_USER": "sa",
-        "DB_PASSWORD": "YourPassword",
-        "DB_TRUST_SERVER_CERTIFICATE": "true"
-      }
-    },
     "erpnext": {
       "command": "node",
       "args": ["C:\\path\\to\\erpnext-mcp-server-extended\\build\\index.js"],
@@ -81,56 +49,99 @@ Add to your Claude Desktop configuration (`%APPDATA%\Claude\claude_desktop_confi
         "ERPNEXT_API_KEY": "your-api-key",
         "ERPNEXT_API_SECRET": "your-api-secret"
       }
-    },
-    "metabase": {
-      "command": "npx",
-      "args": ["@cognitionai/metabase-mcp-server"],
-      "env": {
-        "METABASE_URL": "http://your-metabase-server:3000",
-        "METABASE_API_KEY": "your-metabase-api-key"
-      }
-    },
-    "nextcloud": {
-      "command": "node",
-      "args": ["C:\\path\\to\\nextcloud-mcp\\dist\\cli.js"],
-      "env": {
-        "NEXTCLOUD_HOST": "https://your-nextcloud-instance.com",
-        "NEXTCLOUD_USERNAME": "admin",
-        "NEXTCLOUD_PASSWORD": "your-password"
-      }
     }
   }
 }
 ```
 
-### Environment Variables
+## 🔧 Improved Error Handling
 
-| Variable | Description |
-|----------|-------------|
-| `ERPNEXT_URL` | Your ERPNext instance URL |
-| `ERPNEXT_API_KEY` | API Key (from User settings in ERPNext) |
-| `ERPNEXT_API_SECRET` | API Secret |
+### Before (Original)
+```
+Tool execution failed
+```
+or
+```
+Failed to create Fiscal Year: Request failed with status code 417
+```
 
-### GitHub MCP Server Setup
+### After (Extended)
+```
+Failed to create Fiscal Year (HTTP 417): ValidationError: Companies is required for Fiscal Year
+```
 
-The GitHub MCP Server allows Claude to directly manage your GitHub repositories, create issues, push code, and more.
+The extended server extracts detailed error information from:
+- `_server_messages` - JSON-encoded array of server messages
+- `exception` - Python exception details
+- `exc_type` - Exception type (ValidationError, MandatoryError, etc.)
+- `message` - Human-readable error message
 
-**Prerequisites:**
-- Docker Desktop installed and running
-- GitHub Personal Access Token with `repo`, `workflow`, and `read:org` permissions
+## 📚 Available Tools
 
-**Setup:**
-1. Pull the Docker image: `docker pull ghcr.io/github/github-mcp-server`
-2. Create a GitHub PAT at https://github.com/settings/tokens
-3. Add the configuration to your `claude_desktop_config.json`
-4. Restart Claude Desktop
+### Core Operations
+| Tool | Description |
+|------|-------------|
+| `authenticate_erpnext` | Authenticate with username/password |
+| `get_documents` | List documents with filtering |
+| `get_document` | Get single document |
+| `create_document` | Create new document |
+| `update_document` | Update existing document |
+| `delete_document` | Delete a document |
 
-**Tip:** Set Docker Desktop to start automatically with Windows for seamless integration.
+### Document Lifecycle
+| Tool | Description |
+|------|-------------|
+| `submit_document` | Submit document (Draft → Submitted) |
+| `cancel_document` | Cancel submitted document |
 
-## Usage Examples
+### DocType Operations
+| Tool | Description |
+|------|-------------|
+| `get_doctypes` | List all DocTypes |
+| `get_doctype_fields` | Get field definitions |
+| `get_doctype_meta` | Get complete metadata |
+| `create_doctype` | Create new DocType |
+| `add_doctype_field` | Add field to DocType |
 
-### Create a Custom DocType
+### Workflow Management
+| Tool | Description |
+|------|-------------|
+| `get_workflow` | Get active workflow for DocType |
+| `create_workflow` | Create new workflow |
+| `update_workflow` | Modify existing workflow |
 
+### Customization
+| Tool | Description |
+|------|-------------|
+| `create_custom_field` | Add custom field (survives updates) |
+| `create_property_setter` | Override DocType/field properties |
+
+### Reports
+| Tool | Description |
+|------|-------------|
+| `run_report` | Execute ERPNext report |
+
+## 💡 Usage Examples
+
+### Create a Document
+```
+Create a new Customer named "ACME Corp" with customer_group "Commercial"
+```
+
+### Create a Workflow
+```
+Create an approval workflow for Purchase Order:
+- Draft → Pending Approval (Submit action, Purchase User)
+- Pending Approval → Approved (Approve action, Purchase Manager)  
+- Pending Approval → Rejected (Reject action, Purchase Manager)
+```
+
+### Add Custom Field
+```
+Add a custom field "priority" (Select: Low/Medium/High) to the Customer DocType
+```
+
+### Create DocType
 ```
 Create a DocType called "Project Task" with fields:
 - task_name (Data, required)
@@ -139,45 +150,53 @@ Create a DocType called "Project Task" with fields:
 - due_date (Date)
 ```
 
-### Create a Workflow
+## 🐛 Debug Mode
 
-```
-Create an approval workflow for Sales Order:
-- Draft → Pending Approval (Submit action, Sales User)
-- Pending Approval → Approved (Approve action, Sales Manager)
-- Pending Approval → Rejected (Reject action, Sales Manager)
-```
+Enable debug mode to see detailed API requests and responses:
 
-### Add Custom Field
-
-```
-Add a custom field "priority" (Select: Low/Medium/High) to the Customer DocType
+```bash
+export ERPNEXT_DEBUG=true
 ```
 
-### GitHub Integration
+This will log:
+- All API requests with URLs and parameters
+- All API responses with status codes and data
+- Detailed error information
 
-With the GitHub MCP Server configured, Claude can:
-- Create and manage repositories
-- Push code and create files
-- Create issues and pull requests
-- Manage branches and releases
+## 🔐 Authentication
 
-## Related MCP Servers
+### Option 1: API Key (Recommended)
+Set `ERPNEXT_API_KEY` and `ERPNEXT_API_SECRET` environment variables.
 
-This setup works well with other MCP servers:
+Generate API keys in ERPNext:
+1. Go to User settings
+2. Click "API Access"
+3. Generate new keys
 
-| Server | Purpose | Repository |
-|--------|---------|------------|
-| GitHub MCP | Repository management, code push, issues | [github/github-mcp-server](https://github.com/github/github-mcp-server) |
-| Nextcloud MCP | File storage, calendar, contacts | Community |
-| Metabase MCP | Business intelligence, dashboards | [@cognitionai/metabase-mcp-server](https://www.npmjs.com/package/@cognitionai/metabase-mcp-server) |
-| MSSQL MCP | SQL Server database access | [mssql-mcp](https://www.npmjs.com/package/mssql-mcp) |
+### Option 2: Username/Password
+Use the `authenticate_erpnext` tool at runtime:
+```
+Authenticate with ERPNext using username "admin" and password "..."
+```
 
-## License
+## 📦 ERPNext API Key Setup
+
+1. Login to ERPNext as Administrator
+2. Go to **Settings → User**
+3. Select your user
+4. Scroll to **API Access** section
+5. Click **Generate Keys**
+6. Copy the API Key and API Secret
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
 
 MIT License - see [LICENSE](LICENSE) file.
 
-## Credits
+## 🙏 Credits
 
 - Original MCP Server: [rakeshgangwar/erpnext-mcp-server](https://github.com/rakeshgangwar/erpnext-mcp-server)
 - Extended by: [SVAN GmbH](https://svan.gmbh)
