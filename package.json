@@ -1,0 +1,42 @@
+{
+  "name": "erpnext-mcp-server-extended",
+  "version": "1.0.0",
+  "description": "Extended MCP Server for ERPNext with workflow, custom fields, DocType creation, and improved error handling",
+  "main": "build/index.js",
+  "bin": {
+    "erpnext-mcp-server": "./build/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "start": "node build/index.js",
+    "dev": "ts-node src/index.ts",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "erpnext",
+    "frappe",
+    "model-context-protocol",
+    "ai-agents",
+    "erp"
+  ],
+  "author": "SVAN GmbH",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kai-Oesterling/erpnext-mcp-server-extended.git"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.6.0",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "ts-node": "^10.9.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
